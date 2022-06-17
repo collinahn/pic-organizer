@@ -20,7 +20,11 @@ class FileList:
     def only_media(self):
         res = []
         for pack in self.walk_path_filtered:
-            res.extend(os.path.join(pack[0], file_name) for file_name in pack[2] if file_name.endswith(VALID_EXT))
+            res.extend(
+                os.path.join(pack[0], file_name) 
+                for file_name in pack[2] 
+                if file_name.endswith(VALID_EXT)
+            )
 
         return res
         
@@ -34,5 +38,3 @@ if __name__ == '__main__':
     print(fl.walk_path_filtered)
     print(fl.contents)
 
-    from PIL import Image
-    img = Image.open(fl.contents[1])
