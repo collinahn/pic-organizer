@@ -2,11 +2,11 @@ import os
 from pprint import pprint
 
 from utils.constants import VALID_EXT
+from utils.constants import TEMP_FILE_PREFIX
 
 class FileList:
     def __init__(self, path: str) -> None:
         self.walk_path = tuple(os.walk(path))
-        # pprint(f'{self.walk_path = }')
         self.walk_path_filtered = self.filter_forbidden()
         self.contents = self.only_media()
         self.count = len(self.contents)
@@ -24,6 +24,7 @@ class FileList:
                 os.path.join(pack[0], file_name) 
                 for file_name in pack[2] 
                 if file_name.endswith(VALID_EXT)
+                and not file_name.startswith(TEMP_FILE_PREFIX)
             )
 
         return res

@@ -1,3 +1,5 @@
+import time
+
 from utils.properties import FileProperty
 
 
@@ -7,14 +9,26 @@ class CompareFile:
     '''
     def __init__(self, file_list) -> None:
         self.file_list: list[str] = file_list
-        self.file_dict: dict[str,FileProperty] = {
-            file_path:FileProperty(file_path)
-            for file_path in self.file_list
-        }
+
+        self.count = len(file_list)
+        self.repeat = 2.5
+        self.status = 0
+
+    def lazy_init(self):
+        self.file_dict: dict[str,FileProperty] = self._touch_file()
 
         cmp_size = self._compare_size()
         cmp_hash = self._compare_hash(cmp_size)
         self.result: list[tuple[str]] = cmp_hash
+
+    def _touch_file(self):
+        res: dict[str,FileProperty] = {}
+
+        for file_path in self.file_list:
+            res[file_path] = FileProperty(file_path)
+            self.status += 1 # 현황 기록용
+
+        return res
 
     def _compare_size(self):
         cmp_size: dict[int,list] = {} 
@@ -24,6 +38,7 @@ class CompareFile:
                 continue
             
             cmp_size[file_prop.size] = [file_path, ]
+            self.status += 1 
 
         return cmp_size
             
@@ -49,6 +64,7 @@ class CompareFile:
                 for sorted_file_list in hash_dict.values() 
                 if len(sorted_file_list) > 1
             )
+            self.status += 1
                         
         return identical_file_list
 
