@@ -1,52 +1,58 @@
-import time
+from PyQt6.QtCore import pyqtSignal
 
 from utils.properties import FileProperty
+from folder_utils.file_list import FileList
 
 
 class CompareFile:
     '''
     1차적으로 크기 비교, 크기가 같다면 해시값을 비교한다.
     '''
-    def __init__(self, file_list) -> None:
-        self.file_list: list[str] = file_list
+    def __init__(self, file_obj) -> None:
+        self.file_obj: FileList = file_obj
 
-        self.count = len(file_list)
-        self.repeat = 2.5
-        self.status = 0
+    def lazy_init(self, progress_hint: pyqtSignal, progress_int: pyqtSignal):
+        self.file_list = self.file_obj.contents # 이 시점에 초기화가 완료된다
+        self.file_dict: dict[str,FileProperty] = self._touch_file(progress_hint, progress_int)
 
-    def lazy_init(self):
-        self.file_dict: dict[str,FileProperty] = self._touch_file()
-
-        cmp_size = self._compare_size()
-        cmp_hash = self._compare_hash(cmp_size)
+        cmp_size = self._compare_size(progress_hint, progress_int)
+        cmp_hash = self._compare_hash(cmp_size, progress_hint, progress_int)
         self.result: list[tuple[str]] = cmp_hash
 
-    def _touch_file(self):
+    def _touch_file(self, progress_hint: pyqtSignal, progress_int: pyqtSignal):
+        progress_hint.emit('파일 검색 중(1/3)')
         res: dict[str,FileProperty] = {}
 
-        for file_path in self.file_list:
+        for idx, file_path in enumerate(self.file_list):
             res[file_path] = FileProperty(file_path)
-            self.status += 1 # 현황 기록용
+            progress_int.emit(int((idx+1)/len(self.file_list)*100))
 
         return res
 
-    def _compare_size(self):
+    def _compare_size(self, progress_hint: pyqtSignal, progress_int: pyqtSignal):
+        progress_hint.emit('파일 크기 비교 중(2/3)')
         cmp_size: dict[int,list] = {} 
-        for file_path, file_prop in self.file_dict.items():
+        for idx, (file_path, file_prop) in enumerate(self.file_dict.items()):
             if file_prop.size in cmp_size:
                 cmp_size.get(file_prop.size).append(file_path)
                 continue
             
             cmp_size[file_prop.size] = [file_path, ]
-            self.status += 1 
+            progress_int.emit(int((idx+1)/len(self.file_dict)*100))
 
         return cmp_size
             
-    def _compare_hash(self, size_res: dict):
+    def _compare_hash(self, size_res: dict, progress_hint: pyqtSignal, progress_int: pyqtSignal):
+        progress_hint.emit('파일 해시값 비교 중(3/3)')
         identical_file_list: list[tuple[str]] = []
-        for size, file_list in size_res.items():
+        for idx, (size, file_list) in enumerate(size_res.items()):
             if len(file_list) == 1: continue
-            self._load_hash_value(file_list)
+
+            try:
+                self._load_hash_value(file_list)
+            except OSError:
+                progress_hint.emit('네트워크 폴더는 미리 동기화를 진행해주세요.')
+                continue
 
             # 해시값이 같은 파일들 분류
             hash_dict: dict[int,list] = {}
@@ -64,7 +70,7 @@ class CompareFile:
                 for sorted_file_list in hash_dict.values() 
                 if len(sorted_file_list) > 1
             )
-            self.status += 1
+            progress_int.emit(int((idx+1)/len(size_res)*100))
                         
         return identical_file_list
 

@@ -2,6 +2,8 @@ import os
 import send2trash
 import abc
 
+from PyQt6.QtCore import pyqtSignal
+
 class DeleteFile(metaclass=abc.ABCMeta):
     '''
     하나를 제외하고 나머지를 휴지통으로 보낸다.
@@ -10,8 +12,9 @@ class DeleteFile(metaclass=abc.ABCMeta):
         self.files2handle = overlap_list
         self.delete_flag = valid_flag
     
-    def run(self):
+    def run(self, process_int: pyqtSignal):
         for idx, overlaps in enumerate(self.files2handle):
+            process_int.emit(int((idx+1)//len(self.files2handle)*100))
             if self.delete_flag[idx]:
                 print(f'deleting {overlaps[1:]}')
                 self._delete(list(overlaps[1:]))

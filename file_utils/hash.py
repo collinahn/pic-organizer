@@ -15,10 +15,11 @@ class HashFile:
         with open(self._file_path, 'rb') as f:
             hashd = hashlib.md5()
             buf = f.read(self._block_size)
+            hashd.update(buf)
 
-            while len(buf): # 현재는 전체를 다 본다
-                hashd.update(buf)
-                buf = f.read(self._block_size)
+            # while len(buf): # 현재는 전체를 다 본다
+                # hashd.update(buf)
+                # buf = f.read(self._block_size)
 
         return hashd.hexdigest()
 
