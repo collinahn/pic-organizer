@@ -162,9 +162,6 @@ class MainUI(QWidget):
     def _search_result(self, cmp_object: CompareFile):
         self.final_res: list[tuple[str]] = cmp_object.result
         self.del_flag: list[bool] = [ True for _ in cmp_object.result ]
-        # print(f'total overlap: {len(cmp_object.result)}')
-        # for res in cmp_object.result:
-        #     print(f'{len(res)} files overlapped: {res}')
     
     def on_btn_view_list(self):
         dlg = ViewListDialog(self.final_res, self.del_flag)
@@ -223,7 +220,6 @@ class MainUI(QWidget):
                     coord=(2, 0)
                 )
             )
-
 
 class DiagnoseWorker(QObject):
     finished = pyqtSignal()
