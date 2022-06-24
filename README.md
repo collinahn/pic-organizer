@@ -74,3 +74,4 @@ pyinstaller --windowed --noconfirm --hiddenimport=PyQt6.sip --icon=./icons/thano
 
 ./builddmg.sh
 ```
+요구사항: Apple Silicon Mac에서는 rosetta2로 연 터미널에서 가상환경을 생성하고 가상환경에서 빌드한다.
