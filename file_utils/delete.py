@@ -16,7 +16,7 @@ class DeleteFile(metaclass=abc.ABCMeta):
         for idx, overlaps in enumerate(self.files2handle):
             process_int.emit(int((idx+1)//len(self.files2handle)*100))
             if self.delete_flag[idx]:
-                print(f'deleting {overlaps[1:]}')
+                # print(f'deleting {overlaps[1:]}')
                 self._delete(list(overlaps[1:]))
                 continue
             print('not deleting due to user choices')
