@@ -1,3 +1,5 @@
+VERSION = '1.0.0'
+
 VALID_EXT = (
     'HEIC', 'heic',
     'HEVC', 'hevc',
