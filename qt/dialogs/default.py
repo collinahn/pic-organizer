@@ -5,17 +5,17 @@ from PyQt6.QtWidgets import QPushButton
 from PyQt6.QtGui import QIcon
 from PyQt6.QtCore import Qt
 
-from qt.draggable import DraggablesDialog 
+from qt.draggable import DraggableDialog 
 from utils.qt_utils import resource_path
 
-class DefaultDialog(DraggablesDialog):
+class DefaultDialog(DraggableDialog):
     def __init__(self, msg:str, btn:tuple=None):
         super().__init__()
 
         self.title = '알림'
         self.main_msg = msg
         self.btn = btn
-        self.icon = QIcon(resource_path(relative_path='icons/delete.png'))
+        self.icon = QIcon(resource_path(relative_path='icons/thanos.png'))
 
         self.answer: bool = False
 

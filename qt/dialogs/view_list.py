@@ -23,7 +23,7 @@ class ViewListDialog(QDialog):
         super().__init__()
 
         self.title: str = '파일 확인하기'
-        self.icon = QIcon(resource_path(relative_path='icons/delete.png'))
+        self.icon = QIcon(resource_path(relative_path='icons/thanos.png'))
         self.data: list[tuple[str]] = file_list
         self.meta_data: list[bool] = file_valid
         self.current_file: str = ''
@@ -96,7 +96,7 @@ class ViewListDialog(QDialog):
     def on_btn_filename(self):
         try:
             file_name = self.sender().text()
-            print(f'clicked {file_name}')
+            # print(f'clicked {file_name}')
             self.current_file = file_name # 상태 저장
         except AttributeError as e:
             print(e)
@@ -118,7 +118,7 @@ class ViewListDialog(QDialog):
 
         try:
             idx = int(chkbox.text())
-            print(f'clicked {idx}')
+            # print(f'clicked {idx}')
         except AttributeError as e:
             print(e)
             return

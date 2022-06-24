@@ -51,7 +51,7 @@ class DraggableWidget(QWidget):
         super().mouseReleaseEvent(event)
 
 
-class DraggablesDialog(QDialog):
+class DraggableDialog(QDialog):
     def mousePressEvent(self, event) :
         if event.button() == Qt.MouseButton.LeftButton :
             self.offset = event.pos()
