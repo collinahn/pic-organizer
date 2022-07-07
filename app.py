@@ -1,3 +1,5 @@
+#-*- coding: utf-8 -*-
+
 import sys
 from PyQt6.QtWidgets import QApplication
 from PyQt6.QtGui import QIcon
@@ -19,7 +21,7 @@ class FileApp(DraggableMainWindow):
     def __init__(self) -> None:
         super().__init__()
 
-        self.title = '파일 중복 제거'
+        self.title = 'Thanos'
         self.icon = QIcon(resource_path(relative_path='icons/thanos.ico'))
         self.info_icon = QIcon(resource_path(relative_path='icons/time_stone.png'))
         self.exit_icon = QIcon(resource_path(relative_path='icons/power_stone.png'))
