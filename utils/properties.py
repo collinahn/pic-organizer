@@ -18,8 +18,6 @@ class FileProperty(metaclass=MultiGlobalMeta):
         self.size = os.path.getsize(self.file_path)
         self.hash = 0
 
-        # print(f'{file_path} FileProperty object initiated')
-
     def init_hash(self):
         '''나중에 비교하기 위함'''
         hf = HashFile(path=self.file_path)

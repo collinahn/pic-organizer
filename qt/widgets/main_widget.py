@@ -1,3 +1,5 @@
+#-*- coding: utf-8 -*-
+
 import sys
 from PyQt6.QtGui import QIcon
 from PyQt6.QtCore import Qt
@@ -5,9 +7,10 @@ from PyQt6.QtCore import QSize
 from PyQt6.QtCore import QObject
 from PyQt6.QtCore import QThread
 from PyQt6.QtCore import pyqtSignal
+from PyQt6.QtCore import QDir
 from PyQt6.QtTest import QTest
 from PyQt6.QtWidgets import QWidget
-from PyQt6.QtWidgets import QFileDialog 
+from PyQt6.QtWidgets import QFileDialog
 from PyQt6.QtWidgets import QGridLayout
 from PyQt6.QtWidgets import QPushButton
 from PyQt6.QtWidgets import QLabel
@@ -84,8 +87,7 @@ class MainUI(QWidget):
 
     def on_btn_set_dir(self):
 
-        self._base = BaseFolder(str(QFileDialog.getExistingDirectory(self, "기준 폴더를 선택하세요") or self._base.path))
-        # print(f'{self._base} selected')
+        self._base = BaseFolder(str(QFileDialog.getExistingDirectory(self, "기준 폴더를 선택하세요", QDir.homePath()) or self._base.path))
 
         if self._base.path:
             self.btn_set_dir.setText(self._base.path)
@@ -98,59 +100,49 @@ class MainUI(QWidget):
             self.lbl_explain_final_btn.setText('')
             self.lbl_result_short.setText('')
 
+    def on_diagnose_thread_start(self, file_list: FileList, cmp_file: CompareFile):
+        GlobalBaseFolder(self._base.path)
+        self.btn_start_diagnose.setText('분석 중,,')
+        self.btn_start_diagnose.setEnabled(False)
+        self._replace_widget_fm_main_layout(
+            useless=self.lbl_result_short,
+            useable=self.progress_update_widget,
+            coord=(1, 0)
+        )
+        self.search_worker.run(file_list, cmp_file)
+
+    def on_diagnose_thread_finish(self, file_list: FileList, cmp_file: CompareFile):
+        self._search_result(cmp_file)
+        self.btn_start_diagnose.setText('분석 완료')
+        self.btn_start_diagnose.setEnabled(False)
+        self.btn_result_detail.setEnabled(True)
+        self.btn_delete_overlapped.setEnabled(True)
+        self._replace_widget_fm_main_layout(
+            useless=self.progress_update_widget,
+            useable=self.lbl_result_short,
+            coord=(1, 0)
+        )
+        self.lbl_result_short.setText(f'{file_list.count}개의 파일 중 {len(cmp_file.result)}건의 중복을 찾았습니다.')
+        self.search_worker.deleteLater()
+
     def on_btn_start_diagnose(self):
         if not self._base.path:
             return
 
         file_list = FileList(self._base.path)
         cmp_file = CompareFile(file_obj=file_list)
-        self._replace_widget_fm_main_layout(
-            useless=self.lbl_result_short,
-            useable=self.progress_update_widget,
-            coord=(1, 0)
-        )
 
         self.search_thread = QThread()
         self.search_worker = DiagnoseWorker()
         self.search_worker.moveToThread(self.search_thread)
-        self.search_thread.started.connect( lambda: GlobalBaseFolder(self._base.path) )
-        self.search_thread.started.connect( lambda: self.btn_start_diagnose.setText('분석 중,,') )
-        self.search_thread.started.connect( lambda: self.btn_start_diagnose.setEnabled(False) )
-        self.search_thread.started.connect( lambda: self.search_worker.run(file_list, cmp_file) )
-        self.search_worker.progress_hint.connect(self.progress_update_widget.update_hint)
-        self.search_worker.progress_int.connect(self.progress_update_widget.update_progress)
-
-        self.search_thread.start()
-
-
-        self.search_thread.finished.connect(
-            lambda: self._search_result(cmp_file)
-        )
-        self.search_thread.finished.connect(
-            lambda: self.btn_start_diagnose.setText('분석 완료')
-        )
-        self.search_thread.finished.connect(
-            lambda: self.btn_start_diagnose.setEnabled(False)
-        )
-        self.search_thread.finished.connect(
-            lambda: self.btn_result_detail.setEnabled(True)
-        )
-        self.search_thread.finished.connect(
-            lambda: self.btn_delete_overlapped.setEnabled(True)
-        )
-        self.search_thread.finished.connect(
-            lambda: self._replace_widget_fm_main_layout(
-                useless=self.progress_update_widget,
-                useable=self.lbl_result_short,
-                coord=(1, 0)
-            )
-        )
-        self.search_thread.finished.connect(
-            lambda: self.lbl_result_short.setText(f'{file_list.count}개의 파일 중 {len(cmp_file.result)}건의 중복을 찾았습니다.')
-        )
         self.search_worker.finished.connect(self.search_thread.quit)
         self.search_worker.finished.connect(self.search_thread.deleteLater)
-        self.search_thread.finished.connect(self.search_worker.deleteLater)
+        self.search_worker.progress_hint.connect(self.progress_update_widget.update_hint)
+        self.search_worker.progress_int.connect(self.progress_update_widget.update_progress)
+        self.search_thread.started.connect( lambda: self.on_diagnose_thread_start(file_list, cmp_file) )
+        self.search_thread.finished.connect( lambda: self.on_diagnose_thread_finish(file_list, cmp_file) )
+
+        self.search_thread.start()
 
     def _replace_widget_fm_main_layout(self, *, useless, useable, coord):
         self.main_layout.removeWidget(useless)
@@ -169,6 +161,28 @@ class MainUI(QWidget):
         self.final_res, self.del_flag = dlg.data, dlg.meta_data
         self.lbl_explain_final_btn.setText(f'선택된 {self.del_flag.count(True)}개의 중복을 정리합니다.')
 
+    def on_delete_thread_start(self): 
+        self.btn_delete_overlapped.setText('')
+        self.btn_delete_overlapped.setIcon(self.guntlet_icon)
+        self.btn_delete_overlapped.setIconSize(QSize(49,49))
+        self._replace_widget_fm_main_layout(
+            useless=self.lbl_explain_final_btn,
+            useable=self.progress_delete_widget,
+            coord=(2, 0)
+        )
+        self.delete_worker.run()
+
+    def on_delete_thread_finish(self):
+        self.lbl_explain_final_btn.setText('')
+        self.lbl_result_short.setText('')
+        self._replace_widget_fm_main_layout(
+            useless=self.progress_delete_widget,
+            useable=self.lbl_explain_final_btn,
+            coord=(2, 0)
+        )
+        DefaultDialog('처리를 완료하였습니다.', ('네', )).exec()
+        self.delete_worker.deleteLater()
+
     def delete_all(self):
         if not self.final_res:
             DefaultDialog('중복된 파일이 없습니다.', ('확인', )).exec()
@@ -177,49 +191,20 @@ class MainUI(QWidget):
         dlg_ask = DefaultDialog('삭제를 시작합니다.', ('네', '아니오'))
         dlg_ask.exec()
 
-        if dlg_ask.answer:
-            self._replace_widget_fm_main_layout(
-                useless=self.lbl_explain_final_btn,
-                useable=self.progress_delete_widget,
-                coord=(2, 0)
-            )
+        if not dlg_ask.answer:
+            return
 
-            self.delete_thread = QThread()
-            self.delete_worker = DeleteWorker(self.final_res, self.del_flag)
-            self.delete_worker.moveToThread(self.delete_thread)
-            self.delete_thread.started.connect(self.delete_worker.run)
-            self.delete_worker.finished.connect(self.delete_thread.quit)
-            self.delete_worker.finished.connect(self.delete_thread.deleteLater)
-            self.delete_thread.finished.connect(self.delete_worker.deleteLater)
-            self.delete_worker.progress_int.connect(self.progress_delete_widget.update_progress)
-            self.delete_worker.progress_hint.connect(self.progress_delete_widget.update_hint)
-            self.delete_thread.started.connect(
-                lambda: self.btn_delete_overlapped.setText('')
-            )
-            self.delete_thread.started.connect(
-                lambda: self.btn_delete_overlapped.setIcon(self.guntlet_icon)
-            )
-            self.delete_thread.started.connect(
-                lambda: self.btn_delete_overlapped.setIconSize(QSize(49,49))
-            )
-            self.delete_thread.start()
+        self.delete_thread = QThread()
+        self.delete_worker = DeleteWorker(self.final_res, self.del_flag)
+        self.delete_worker.moveToThread(self.delete_thread)
+        self.delete_worker.finished.connect(self.delete_thread.quit)
+        self.delete_worker.finished.connect(self.delete_thread.deleteLater)
+        self.delete_worker.progress_int.connect(self.progress_delete_widget.update_progress)
+        self.delete_worker.progress_hint.connect(self.progress_delete_widget.update_hint)
+        self.delete_thread.started.connect( lambda: self.on_delete_thread_start() )
+        self.delete_thread.finished.connect( lambda: self.on_delete_thread_finish() )
 
-            self.delete_thread.finished.connect(
-                lambda: DefaultDialog('처리를 완료하였습니다.', ('네', )).exec()
-            )
-            self.delete_thread.finished.connect(
-                lambda: self.lbl_explain_final_btn.setText('')
-            )
-            self.delete_thread.finished.connect(
-                lambda: self.lbl_result_short.setText('')
-            )
-            self.delete_thread.finished.connect(
-                lambda: self._replace_widget_fm_main_layout(
-                    useless=self.progress_delete_widget,
-                    useable=self.lbl_explain_final_btn,
-                    coord=(2, 0)
-                )
-            )
+        self.delete_thread.start()
 
 class DiagnoseWorker(QObject):
     finished = pyqtSignal()
