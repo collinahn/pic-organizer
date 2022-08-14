@@ -7,6 +7,7 @@ from PyQt6.QtWidgets import QBoxLayout
 from PyQt6.QtWidgets import QLabel
 from PyQt6.QtCore import Qt
 
+
 class ProgressWidget(QWidget):
     def __init__(self):
         QWidget.__init__(self, flags=Qt.WindowType.Widget)
@@ -17,7 +18,8 @@ class ProgressWidget(QWidget):
 
     def init_widget(self):
         self.setWindowTitle(self.title)
-        self.box_layout = QBoxLayout(QBoxLayout.Direction.TopToBottom, parent=self)
+        self.box_layout = QBoxLayout(
+            QBoxLayout.Direction.TopToBottom, parent=self)
         self.setLayout(self.box_layout)
 
         self.progress_hint = QLabel()
@@ -33,9 +35,10 @@ class ProgressWidget(QWidget):
     def update_hint(self, hint: str):
         self.progress_hint.setText(hint)
 
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    
+
     bar = ProgressWidget()
     bar.show()
 

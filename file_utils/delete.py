@@ -1,17 +1,19 @@
-import os 
+import os
 import send2trash
 import abc
 
 from PyQt6.QtCore import pyqtSignal
 
+
 class DeleteFile(metaclass=abc.ABCMeta):
     '''
-    하나를 제외하고 나머지를 휴지통으로 보낸다.
+    Send to trashBin except first one
     '''
+
     def __init__(self, overlap_list, valid_flag) -> None:
         self.files2handle = overlap_list
         self.delete_flag = valid_flag
-    
+
     def run(self, process_int: pyqtSignal):
         for idx, overlaps in enumerate(self.files2handle):
             process_int.emit(int((idx+1)//len(self.files2handle)*100))
@@ -24,6 +26,7 @@ class DeleteFile(metaclass=abc.ABCMeta):
     def _delete(self, file_list: list):
         ...
 
+
 class DeleteFileWindows(DeleteFile):
     def _delete(self, file_list: list):
         for file in file_list:
@@ -31,6 +34,7 @@ class DeleteFileWindows(DeleteFile):
                 os.remove(file)
             except Exception as e:
                 print(f'{e} / an error occurred while deleting {file}')
+
 
 class DeleteFileMac(DeleteFile):
     def _delete(self, file_list: list):
@@ -40,6 +44,8 @@ class DeleteFileMac(DeleteFile):
             except Exception as e:
                 print(f'{e} / an error occurred while sending {file} to trash')
 
+
 class DeleteFileStrategy:
     def __init__(self, *args, **kwargs) -> None:
-        self.delete = DeleteFileWindows(*args, **kwargs) if os.name == 'nt' else DeleteFileMac(*args, **kwargs)
+        self.delete = DeleteFileWindows(
+            *args, **kwargs) if os.name == 'nt' else DeleteFileMac(*args, **kwargs)

@@ -1,9 +1,11 @@
 import hashlib
 
+
 class HashFile:
     '''
-    파일의 동일성을 체크하기 위한 값을 계산한다.
+    make hash value in order to check whether file is same 
     '''
+
     def __init__(self, path) -> None:
         self._block_size = 65536
         self._file_path = path
@@ -18,10 +20,11 @@ class HashFile:
             hashd.update(buf)
 
             # while len(buf): # 현재는 전체를 다 본다
-                # hashd.update(buf)
-                # buf = f.read(self._block_size)
+            # hashd.update(buf)
+            # buf = f.read(self._block_size)
 
         return hashd.hexdigest()
+
 
 if __name__ == '__main__':
 

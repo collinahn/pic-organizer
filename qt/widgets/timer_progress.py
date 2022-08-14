@@ -7,6 +7,7 @@ from PyQt6.QtWidgets import QProgressBar
 from PyQt6.QtCore import QTimer
 from PyQt6.QtCore import Qt
 
+
 class ProgressBarTimer(QWidget):
     def __init__(self, shared_mem: list, Parent=None):
         super(ProgressBarTimer, self).__init__(Parent)
@@ -26,16 +27,16 @@ class ProgressBarTimer(QWidget):
 
     def _setup_numbers(self):
         try:
-            return sum(( store.count for store in self.shared_mem ))
+            return sum((store.count for store in self.shared_mem))
         except AttributeError:
             return -1
 
     def _current_status(self):
         try:
-            return sum(( store.status for store in self.shared_mem ))            
+            return sum((store.status for store in self.shared_mem))
         except AttributeError:
             return -1
-    
+
     def _setup_UI(self):
         self.setWindowTitle(self.title)
 
@@ -50,7 +51,6 @@ class ProgressBarTimer(QWidget):
         layout.addWidget(self.comment, 0, 0)
         layout.addWidget(self.pbar, 1, 0)
 
-
     def _update(self):
         progress = int(self._current_status() / self.total_count)
         print(self._current_status(), self.total_count)
@@ -59,7 +59,7 @@ class ProgressBarTimer(QWidget):
 
         self.pbar.setValue(progress)
         print(f'value set to {self.pbar.value()}')
-        
+
 
 if __name__ == '__main__':
     from PyQt6.QtWidgets import QApplication

@@ -2,13 +2,15 @@ import os
 
 from file_utils.hash import HashFile
 
+
 class MultiGlobalMeta(type):
     _instances = {}
+
     def __call__(self, file_path: str, *args, **kwargs):
         if file_path not in self._instances:
-            self._instances[file_path] = super().__call__(file_path, *args, **kwargs)
+            self._instances[file_path] = super().__call__(
+                file_path, *args, **kwargs)
         return self._instances[file_path]
-
 
 
 class FileProperty(metaclass=MultiGlobalMeta):
@@ -23,6 +25,7 @@ class FileProperty(metaclass=MultiGlobalMeta):
         hf = HashFile(path=self.file_path)
         self.hash = hf.value
 
+
 if __name__ == '__main__':
 
     props2 = FileProperty('02')
@@ -30,5 +33,3 @@ if __name__ == '__main__':
     props01 = FileProperty('01')
     print(props2 == props1)
     print(props01 == props1)
-
-    

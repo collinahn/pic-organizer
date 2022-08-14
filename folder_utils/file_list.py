@@ -1,8 +1,8 @@
 import os
-from pprint import pprint
 
 from utils.constants import VALID_EXT
 from utils.constants import TEMP_FILE_PREFIX
+
 
 class FileList:
     def __init__(self, path: str) -> None:
@@ -17,9 +17,9 @@ class FileList:
 
     @staticmethod
     def filter_forbidden(walk_path) -> tuple:
-        return tuple( 
-            pack for pack in walk_path 
-            if not os.path.basename(pack[0]).startswith(('.', '_')) 
+        return tuple(
+            pack for pack in walk_path
+            if not os.path.basename(pack[0]).startswith(('.', '_'))
         )
 
     @staticmethod
@@ -27,14 +27,15 @@ class FileList:
         res = []
         for pack in walk_path_filtered:
             res.extend(
-                os.path.join(pack[0], file_name) 
-                for file_name in pack[2] 
+                os.path.join(pack[0], file_name)
+                for file_name in pack[2]
                 if file_name.endswith(VALID_EXT)
                 and not file_name.startswith(TEMP_FILE_PREFIX)
             )
 
         return res
-        
+
+
 if __name__ == '__main__':
     print(*os.walk(os.getcwd()), sep='\n')
 
@@ -44,4 +45,3 @@ if __name__ == '__main__':
     print(len(fl.walk_path_filtered))
     print(fl.walk_path_filtered)
     print(fl.contents)
-

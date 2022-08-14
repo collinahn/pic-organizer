@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 import sys
 from PyQt6.QtWidgets import QApplication
@@ -17,17 +17,20 @@ build on mac:
 pyinstaller --windowed --noconfirm --hiddenimport=PyQt6.sip --icon=./icons/thanos.ico --add-data "icons/thanos.ico:./icons" --add-data "icons/thanos.png:./icons" --add-data "icons/guntlet.png:./icons" --add-data "icons/mind_stone.png:./icons" --add-data "icons/power_stone.png:./icons" --add-data "icons/reality_stone.png:./icons" --add-data "icons/space_stone.png:./icons" --add-data "icons/time_stone.png:./icons" -n Thanos app.py 
 '''
 
+
 class FileApp(DraggableMainWindow):
     def __init__(self) -> None:
         super().__init__()
 
         self.title = 'Thanos'
         self.icon = QIcon(resource_path(relative_path='icons/thanos.ico'))
-        self.info_icon = QIcon(resource_path(relative_path='icons/time_stone.png'))
-        self.exit_icon = QIcon(resource_path(relative_path='icons/power_stone.png'))
+        self.info_icon = QIcon(resource_path(
+            relative_path='icons/time_stone.png'))
+        self.exit_icon = QIcon(resource_path(
+            relative_path='icons/power_stone.png'))
 
         self._init_ui()
-    
+
     def _init_ui(self):
         self.setWindowTitle(self.title)
         self.setWindowIcon(self.icon)
@@ -51,6 +54,7 @@ class FileApp(DraggableMainWindow):
 
     def _on_info_modal(self):
         ProgramInfoDialog().exec()
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
