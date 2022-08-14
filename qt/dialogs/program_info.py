@@ -33,15 +33,16 @@ class ProgramInfoDialog(QDialog):
         lbl_dev = QLabel('개발자:')
         lbl_dev_info = QLabel('안태영(Collin Ahn)')
         lbl_source = QLabel('소스코드:')
-        lbl_source_url = QLabel('<a href="https://github.com/collinahn/pic-organizer">https://github.com/collinahn/pic-organizer</a>')
+        lbl_source_url = QLabel(
+            '<a href="https://github.com/collinahn/pic-organizer">https://github.com/collinahn/pic-organizer</a>')
         lbl_source_url.setOpenExternalLinks(True)
         lbl_contact = QLabel('연락처:')
-        lbl_contact_info = QLabel('cording-gopher0c@icloud.com')
+        lbl_contact_info = QLabel('collinahn@hufs.ac.kr')
         lbl_license = QLabel('License:')
-        lbl_license_info = QLabel('MIT License \nCopyright (c) 2022 Collin Ahn')
+        lbl_license_info = QLabel(
+            'MIT License \nCopyright (c) 2022 Collin Ahn')
 
-        
-        self.btn_exit= QPushButton('확인')
+        self.btn_exit = QPushButton('확인')
         self.btn_exit.clicked.connect(self.on_click_out)
 
         lbl_version.setAlignment(Qt.AlignmentFlag.AlignTop)
@@ -72,6 +73,6 @@ class ProgramInfoDialog(QDialog):
 if __name__ == '__main__':
     import sys
     app = QApplication(sys.argv)
-    
+
     i = ProgramInfoDialog()
     i.exec()
