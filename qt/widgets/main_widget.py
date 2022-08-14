@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import platform
 from PyQt6.QtGui import QIcon
 from PyQt6.QtCore import Qt
 from PyQt6.QtCore import QSize
@@ -131,6 +132,10 @@ class MainUI(QWidget):
     def on_btn_start_diagnose(self):
         if not self._base.path:
             return
+
+        if platform.system() == 'Darwin':
+            DefaultDialog(
+                '맥에서는 파일 이름에 한글이 포함된 경우를 지원하지 않습니다.\n파일 이름에 한글이 포함된 경우 예고 없이 종료될 수 있습니다.', ('확인했습니다.',)).exec()
 
         file_list = FileList(self._base.path)
         cmp_file = CompareFile(file_obj=file_list)

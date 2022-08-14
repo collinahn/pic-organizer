@@ -53,12 +53,10 @@ class ProgressBarTimer(QWidget):
 
     def _update(self):
         progress = int(self._current_status() / self.total_count)
-        print(self._current_status(), self.total_count)
         if progress == self.pbar.value():
             return
 
         self.pbar.setValue(progress)
-        print(f'value set to {self.pbar.value()}')
 
 
 if __name__ == '__main__':

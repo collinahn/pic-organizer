@@ -1,4 +1,5 @@
 import os
+import re
 import webbrowser
 
 
@@ -22,3 +23,8 @@ class Browser(object):
             target = os.path.dirname(path)
 
         return bool(webbrowser.open(f'file://{target}'))
+
+    @staticmethod
+    def korean_included_for_mac(dir):
+        cnt = len(re.findall(u'[\u3130-\u318F\uAC00-\uD7A3]+', dir))
+        return cnt > 0

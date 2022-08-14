@@ -3,6 +3,7 @@ from dataclasses import field
 
 from utils.metaclasses import MetaSingleton
 
+
 @dataclass
 class BaseFolder:
     path: str = field(default_factory='')
@@ -11,6 +12,7 @@ class BaseFolder:
 @dataclass
 class GlobalBaseFolder(BaseFolder, metaclass=MetaSingleton):
     ...
+
 
 if __name__ == '__main__':
 
@@ -24,4 +26,3 @@ if __name__ == '__main__':
     base = GlobalBaseFolder(base.path)
     base = GlobalBaseFolder('123')
     print(base)
-

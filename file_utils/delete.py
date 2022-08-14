@@ -33,7 +33,7 @@ class DeleteFileWindows(DeleteFile):
             try:
                 os.remove(file)
             except Exception as e:
-                print(f'{e} / an error occurred while deleting {file}')
+                print(e)
 
 
 class DeleteFileMac(DeleteFile):
@@ -42,7 +42,7 @@ class DeleteFileMac(DeleteFile):
             try:
                 send2trash.send2trash(file)
             except Exception as e:
-                print(f'{e} / an error occurred while sending {file} to trash')
+                print(e)
 
 
 class DeleteFileStrategy:
